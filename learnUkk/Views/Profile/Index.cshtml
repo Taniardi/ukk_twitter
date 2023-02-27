@@ -1,0 +1,65 @@
+﻿@model learnUkk.Models.userProfile
+
+@{
+    ViewData["Title"] = "Profile Page";
+
+    //check response code
+    if (Context.Response.StatusCode.ToString().First() != '2')
+    {
+        @Html.Raw(TempData["msg"])
+    }
+
+    var checkAuth = Context.Request.Cookies["user"];
+    if (string.IsNullOrEmpty(checkAuth))
+    {
+        Context.Response.Redirect("/Auth");
+    }
+}
+
+
+<div class="card col-lg-4 my-2 mx-auto d-flex justify-content-center">
+    <form class="card-body d-flex flex-column align-items-center" enctype="multipart/form-data" asp-controller="Profile" asp-action="Update">
+        <input type="file" asp-for="file" class="input-group-prepend my-2" id="inputImage" accept="image/jpg, image/jpeg" />
+        @if(Model.Picture == null)
+        {
+            <img src="~/images/dafault-profile-image.png" id="imagePreview" class="rounded-circle img-profile border mx-2">
+        }
+        else{
+            <img src="~/images/@Model.Picture" id="imagePreview" class="rounded-circle img-profile border mx-2">
+        }
+        <label class="col-lg-5 btn btn-primary" for="inputImage">Choose Image</label>
+        <span>@Model.userName</span>
+        <input type="text" value="@Model.Bio" asp-for="Bio" class="my-2"/>
+        <button class="col-lg-5 btn btn-primary">Save</button>
+    </form>
+</div>
+
+<style>
+    input[type="file"]
+    {
+        display: none;
+        cursor: pointer;
+    }
+
+    .img-profile
+    {
+        width: 100px;
+        height: 100px;
+    }
+</style>
+
+<script>
+    //Get the button and image
+    let uploadButton = document.getElementById("inputImage");
+    let imagePriview = document.getElementById("imagePreview");
+
+    uploadButton.onchange = () => {
+        //reader and set src atribute to img
+        let reader = new FileReader();
+        reader.readAsDataURL(uploadButton.files[0]);
+        console.log(uploadButton.files[0]);
+        reader.onload = () => {
+            imagePriview.setAttribute("src", reader.result);
+        }
+    }
+</script>

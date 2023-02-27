@@ -1,0 +1,42 @@
+﻿@model learnUkk.Models.editComment
+@{
+    ViewData["Title"] = "Edit Comment";
+
+    //check response code
+    if (Context.Response.StatusCode.ToString().First() != '2')
+    {
+        @Html.Raw(TempData["msg"])
+    }
+
+    var checkAuth = Context.Request.Cookies["user"];
+    if (string.IsNullOrEmpty(checkAuth))
+    {
+        Context.Response.Redirect("/Auth");
+    }
+}
+
+<div class="card col-lg-6 mx-auto mt-2">
+    <form class="card-body d-flex flex-column" enctype="multipart/form-data" asp-controller="Tweet" asp-action="EditCommentPost">
+        <img id="imagePreview" src="~/images/@Model.Picture" />
+        <input type="hidden" value="@Model.idComment" asp-for="idComment" />
+        <input type="text" class="my-2" asp-for="Comment1" value="@Model.Comment1" />
+        <input type="file" asp-for="file" class="input-group-prepend my-2" id="inputImage" accept="image/jpg, image/jpeg" />
+        <button type="submit" class="btn btn-warning">Edit</button>
+    </form>
+</div>
+
+<script>
+    //Get the button and image
+    let uploadButton = document.getElementById("inputImage");
+    let imagePriview = document.getElementById("imagePreview");
+
+    uploadButton.onchange = () => {
+        //reader and set src atribute to img
+        let reader = new FileReader();
+        reader.readAsDataURL(uploadButton.files[0]);
+        console.log(uploadButton.files[0]);
+        reader.onload = () => {
+            imagePriview.setAttribute("src", reader.result);
+        }
+    }
+</script>

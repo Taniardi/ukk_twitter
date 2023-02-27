@@ -1,0 +1,160 @@
+﻿@model learnUkk.Models.tweetPage
+
+@{
+    ViewData["Title"] = "Home Page";
+
+    //check response code
+    if (Context.Response.StatusCode.ToString().First() != '2')
+    {
+        @Html.Raw(TempData["msg"])
+    } 
+
+    var checkAuth = Context.Request.Cookies["user"];
+    if (string.IsNullOrEmpty(checkAuth))
+    {
+        Context.Response.Redirect("/Auth");
+    }
+}
+
+<div class="conatainer col-lg-12 d-flex mt-1">
+    <div class="col-lg-3 d-flex flex-column">
+        <img class="nav-link text-dark logo" src="~/images/logo-twitter.png" />
+        <a class="nav-link text-dark" asp-controller="Home" asp-action="index">Home</a>
+        <a class="nav-link text-dark"  asp-controller="Profile" asp-action="index">Profile</a>
+        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
+    </div>
+     <div class="col-lg-6 ">
+        <div class="d-flex justify-content-between">
+            <form class="d-flex flex-column col-lg-8" asp-controller="Tweet" asp-action="Search">
+            <input type="text" class="p-1" asp-for="searchString" placeholder="Search" />
+            </form>
+            <a class="col-lg-3 btn btn-primary" asp-controller="Home" asp-action="Create">Create new</a>
+        </div>
+        <div class="d-flex flex-column">
+            @foreach (var item in Model.tweetData)
+            {
+                <div class="card mt-2"> 
+                <div class="card-body"> 
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center">
+                            @if(item.User.Picture == null)
+                            {
+                                <img src="~/images/dafault-profile-image.png" class="rounded-circle img-profile border mx-2">
+                            }
+                            else{
+                                <img src="~/images/@item.User.Picture" class="rounded-circle img-profile border mx-2">
+                            }
+                            <span>@item.User.userName</span>
+                        </div>
+                        @if (item.User.userId == Convert.ToInt32(Context.Request.Cookies["user"]))
+                        {
+                            <div class="d-flex">
+                                <form class="d-flex flex-column" asp-controller="Tweet" asp-action="EditTweet">
+                                    <input type="hidden" value="@item.idTweet" asp-for="editTweetId" />
+                                    <button class="btn btn-warning mx-2">Edit</button>
+                                </form>
+                                <form class="d-flex flex-column" asp-controller="Tweet" asp-action="DeleteTweet">
+                                    <input type="hidden" value="@item.idTweet" asp-for="editTweetId" />
+                                    <button class="btn btn-danger">Delete</button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                    <div class="d-flex flex-column">
+                        @if (item.Picture != null)
+                        {
+                            <img src="~/images/@item.Picture" class="img-fluid my-2" >
+                        }
+                        <span>@item.Tweet1</span><br />
+                        <span class="my-4 ms-4">Comment</span>
+                            <div class="ms-4 card">
+                                <div class="card-body">
+                                    <form class="d-flex flex-column" enctype="multipart/form-data" asp-controller="Tweet" asp-action="Comment">
+                                        <img id="imagePreview-@item.idTweet" class="img-fluid my-2" />
+                                       <div class="d-flex justify-content-between">
+                                           <input type="hidden" asp-for="commentPostReq.tweetId" value="@item.idTweet"/>
+                                            <input type="text" asp-for="commentPostReq.tweet_text" class="col-lg-9 mr-1" />
+                                            <input type="file" asp-for="commentPostReq.file" class="input-group-prepend input-file-comment" id="inputImage-@item.idTweet" accept="image/jpg, image/jpeg">
+                                            <label for="inputImage-@item.idTweet" class="btn btn-primary col-lg-3  mx-2">Upload Image</label>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary mt-2">Comment</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                         @foreach(var comment in item.CommentList)
+                            {
+                            <div class="ms-4 card my-2">
+                                <div class="card-body">
+                                   <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            @if(comment.User.Picture == null)
+                                            {
+                                                <img src="~/images/dafault-profile-image.png" class="rounded-circle img-profile border mx-2">
+                                            }
+                                            else{
+                                                <img src="~/images/@comment.User.Picture" class="rounded-circle img-profile border mx-2">
+                                            }
+                                            <span>@comment.User.userName</span>
+                                        </div>
+                                        @if (comment.User.userId == Convert.ToInt32(Context.Request.Cookies["user"]))
+                                        {
+                                            <div class="d-flex">
+                                                <form class="d-flex flex-column mx-2" asp-controller="Tweet" asp-action="EditComment">
+                                                    <input type="hidden" value="@comment.CommentId" asp-for="editCommentId" />
+                                                    <button class="btn btn-warning">Edit</button>
+                                                </form>
+                                                <form class="d-flex flex-column" asp-controller="Tweet" asp-action="DeleteComment">
+                                                    <input type="hidden" value="@comment.CommentId" asp-for="editCommentId" />
+                                                    <button class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        }
+                                    </div>
+                                    @if (comment.Picture != null)
+                                    {
+                                        <img src="~/images/@comment.Picture" class="img-fluid my-2" ><br />
+                                    }
+                                    <span>@comment.Comment1</span><br />
+                                </div>
+                            </div>
+                            }
+                    </div>
+                </div>
+            }
+        </div>
+        </div>
+</div>
+<style>
+    .img-profile{
+        width: 30px;
+        height: 30px;
+    }
+    input[type="file"]
+    {
+        display: none;
+    }
+    .logo{
+        width: 100px;
+        height: auto;
+    }
+</style>
+    <script>
+        const uploadButton = document.querySelectorAll(".input-file-comment");
+
+        uploadButton.forEach((el) => {
+            el.addEventListener('change', (ev) => {
+                const target = ev.currentTarget;
+                const file = target.files[0];
+                if (!file) return;
+
+                const id = el.id.split('-')[1];
+                const previewEl = document.querySelector(`#imagePreview-${id}`);
+
+                if (!previewEl) return;
+
+                previewEl.src = URL.createObjectURL(file);
+            });
+        });
+    </script>
+

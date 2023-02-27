@@ -1,0 +1,33 @@
+﻿@model learnUkk.Models.loginReq
+@{
+    //Mengubah Title
+    ViewData["Title"] = "Login";
+
+    //check response code
+    if (Context.Response.StatusCode.ToString().First() != '2')
+    {
+        @Html.Raw(TempData["msg"])
+    }
+
+    //cek auth
+    var checkAuth = Context.Request.Cookies["user"];    
+    if (!string.IsNullOrEmpty(checkAuth))
+    {
+        Context.Response.Redirect("/Home");
+    }
+}   
+
+<div class="card col-lg-5 mx-auto mt-3 ">
+    <form class=" card-body" asp-action="Login">
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <input type="email" asp-for="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        </div>      
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input asp-for="password" type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button> <br />
+        <span>don't have an account?<a asp-controller="Auth" asp-action="Register">Register</a></span>
+    </form>
+</div>

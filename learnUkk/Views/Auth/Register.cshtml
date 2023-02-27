@@ -1,0 +1,35 @@
+﻿@model learnUkk.Models.registerReq
+@{
+    //change title
+    ViewData["Title"] = "Register";
+
+    //check response code
+    if (Context.Response.StatusCode.ToString().First() != '2')
+    {
+        @Html.Raw(TempData["msg"])
+    }
+}
+
+<div class="col-lg-5 mx-auto mt-3 card">
+    <form class="card-body" asp-action="Register">
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Email address</label>
+            <input type="email" asp-for="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputusername" class="form-label">Username</label>
+            <input type="text" asp-for="username" class="form-control" id="exampleInputusername" >
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input asp-for="password" type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Retype Password</label>
+            <input asp-for="retype_password" type="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button> <br />
+        <span>already have an account?<a asp-controller="Auth" asp-action="Login">Login</a></span>
+    </form>
+</div>
+
